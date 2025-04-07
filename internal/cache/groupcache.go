@@ -104,7 +104,7 @@ func (g *Group) Get(key string) (ByteView, error) {
 	metrics.RecordRequest()
 
 	if value, ok := g.cache.get(key); ok {
-		loggerInstance.Infof("Group %s 缓存命中..., key %s...", g.name, key)
+		loggerInstance.Infof("Group %s cache hit ..., key %s...", g.name, key)
 		return value, nil
 	}
 

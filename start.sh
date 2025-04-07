@@ -18,7 +18,7 @@ echo "Starting etcd cluster..."
 goreman -f pkg/etcd/cluster/Procfile start &
 sleep 5
 
-echo "Starting ggcache services..."
+echo "Starting distcache services..."
 go run main.go -port 9999 &
 sleep 3
 

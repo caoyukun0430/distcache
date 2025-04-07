@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # 配置参数
-NUM_CLIENTS=20          # 要启动的客户端数量
+NUM_CLIENTS=2          # 要启动的客户端数量
 INTERVAL=0.1           # 客户端启动间隔（秒）
 
 # 获取脚本所在目录的绝对路径
