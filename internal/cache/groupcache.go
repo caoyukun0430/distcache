@@ -149,12 +149,15 @@ func (g *Group) fetchFromPeer(peer Fetcher, key string) (ByteView, error) {
 func (g *Group) getLocally(key string) (ByteView, error) {
 	bytes, err := g.retriever.retrieve(key)
 	if err != nil {
+		metrics.RecordDatabaseMiss()
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			// Cache empty result to prevent cache penetration
 			loggerInstance.Infof("caching empty result for non-existent key %q to prevent cache penetration", key)
 			g.populateCache(key, ByteView{})
 		}
 		return ByteView{}, fmt.Errorf("failed to retrieve key %q locally: %w", key, err)
+	} else {
+		metrics.RecordDatabaseHit()
 	}
 
 	value := ByteView{b: cloneBytes(bytes)}
