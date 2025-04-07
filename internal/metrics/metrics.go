@@ -13,11 +13,12 @@ import (
 )
 
 var (
+	// 添加实例标识符
 	instanceName string
 
 	loggerInstance = logger.NewLogger()
 
-	// cache hit related
+	// 缓存命中相关指标
 	cacheHits = promauto.NewCounter(prometheus.CounterOpts{
 		Name: "distcache_hits_total",
 		Help: "The total number of cache hits",
@@ -43,7 +44,25 @@ var (
 		},
 	})
 
+	// 
+	databaseHits = promauto.NewCounter(prometheus.CounterOpts{
+		Name: "database_hits_total",
+		Help: "The total number of database hits",
+		ConstLabels: prometheus.Labels{
+			"instance": instanceName,
+		},
+	})
 
+	// 
+	databaseMisses = promauto.NewCounter(prometheus.CounterOpts{
+		Name: "database_misses_total",
+		Help: "The total number of database misses",
+		ConstLabels: prometheus.Labels{
+			"instance": instanceName,
+		},
+	})
+
+	// 总请求数指标
 	requestsTotal = promauto.NewCounter(prometheus.CounterOpts{
 		Name: "distcache_requests_total",
 		Help: "The total number of requests received",
@@ -52,7 +71,7 @@ var (
 		},
 	})
 
-
+	// 缓存大小相关指标
 	cacheSize = promauto.NewGauge(prometheus.GaugeOpts{
 		Name: "distcache_size_bytes",
 		Help: "The current size of the cache in bytes",
@@ -69,6 +88,7 @@ var (
 		},
 	})
 
+	// 请求延迟指标
 	requestDuration = promauto.NewHistogramVec(
 		prometheus.HistogramOpts{
 			Name:    "distcache_request_duration_seconds",
@@ -80,6 +100,7 @@ var (
 )
 
 func init() {
+	// 获取主机名作为实例标识符
 	hostname, err := os.Hostname()
 	if err != nil {
 		hostname = "unknown"
@@ -87,18 +108,19 @@ func init() {
 	instanceName = hostname
 }
 
+// StartMetricsServer 启动指标收集服务器
 func StartMetricsServer(port int) {
 	mux := http.NewServeMux()
 
-	// register metrics endpoint
+	// 注册 /metrics 端点
 	mux.Handle("/metrics", promhttp.Handler())
 
-	// redirect from / to /metrics
+	// 添加从根路径到 /metrics 的重定向
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/metrics", http.StatusFound)
 	})
 
-	// async start
+	// 异步启动服务器
 	go func() {
 		addr := fmt.Sprintf(":%d", port)
 		loggerInstance.Infof("Starting metrics server on %s", addr)
@@ -108,22 +130,37 @@ func StartMetricsServer(port int) {
 	}()
 }
 
+// RecordCacheHit 记录缓存命中
 func RecordCacheHit() {
 	cacheHits.Inc()
 }
 
+// RecordCacheMiss 记录缓存未命中
 func RecordCacheMiss() {
 	cacheMisses.Inc()
 }
 
+// RecordDatabaseHit 
+func RecordDatabaseHit() {
+	databaseHits.Inc()
+}
+
+// RecordDatabaseMiss 
+func RecordDatabaseMiss() {
+	databaseMisses.Inc()
+}
+
+// RecordEviction 记录缓存驱逐
 func RecordEviction() {
 	cacheEvictions.Inc()
 }
 
+// UpdateCacheSize 更新缓存大小（字节）
 func UpdateCacheSize(size int64) {
 	cacheSize.Set(float64(size))
 }
 
+// UpdateCacheItemCount 更新缓存项数量
 func UpdateCacheItemCount(count int64) {
 	cacheItemCount.Set(float64(count))
 }
