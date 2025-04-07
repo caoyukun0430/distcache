@@ -43,6 +43,23 @@ var (
 		},
 	})
 
+	// 
+	databaseHits = promauto.NewCounter(prometheus.CounterOpts{
+		Name: "database_hits_total",
+		Help: "The total number of database hits",
+		ConstLabels: prometheus.Labels{
+			"instance": instanceName,
+		},
+	})
+
+	// 
+	databaseMisses = promauto.NewCounter(prometheus.CounterOpts{
+		Name: "database_misses_total",
+		Help: "The total number of database misses",
+		ConstLabels: prometheus.Labels{
+			"instance": instanceName,
+		},
+	})
 
 	requestsTotal = promauto.NewCounter(prometheus.CounterOpts{
 		Name: "distcache_requests_total",
@@ -51,7 +68,6 @@ var (
 			"instance": instanceName,
 		},
 	})
-
 
 	cacheSize = promauto.NewGauge(prometheus.GaugeOpts{
 		Name: "distcache_size_bytes",
@@ -87,6 +103,7 @@ func init() {
 	instanceName = hostname
 }
 
+// StartMetricsServer 启动指标收集服务器
 func StartMetricsServer(port int) {
 	mux := http.NewServeMux()
 
@@ -108,22 +125,37 @@ func StartMetricsServer(port int) {
 	}()
 }
 
+// RecordCacheHit 记录缓存命中
 func RecordCacheHit() {
 	cacheHits.Inc()
 }
 
+// RecordCacheMiss 记录缓存未命中
 func RecordCacheMiss() {
 	cacheMisses.Inc()
 }
 
+// RecordDatabaseHit 
+func RecordDatabaseHit() {
+	databaseHits.Inc()
+}
+
+// RecordDatabaseMiss 
+func RecordDatabaseMiss() {
+	databaseMisses.Inc()
+}
+
+// RecordEviction 记录缓存驱逐
 func RecordEviction() {
 	cacheEvictions.Inc()
 }
 
+// UpdateCacheSize 更新缓存大小（字节）
 func UpdateCacheSize(size int64) {
 	cacheSize.Set(float64(size))
 }
 
+// UpdateCacheItemCount 更新缓存项数量
 func UpdateCacheItemCount(count int64) {
 	cacheItemCount.Set(float64(count))
 }
