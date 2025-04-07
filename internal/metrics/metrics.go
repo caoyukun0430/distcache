@@ -13,12 +13,11 @@ import (
 )
 
 var (
-	// 添加实例标识符
 	instanceName string
 
 	loggerInstance = logger.NewLogger()
 
-	// 缓存命中相关指标
+	// cache hit related
 	cacheHits = promauto.NewCounter(prometheus.CounterOpts{
 		Name: "distcache_hits_total",
 		Help: "The total number of cache hits",
@@ -44,7 +43,7 @@ var (
 		},
 	})
 
-	// 总请求数指标
+
 	requestsTotal = promauto.NewCounter(prometheus.CounterOpts{
 		Name: "distcache_requests_total",
 		Help: "The total number of requests received",
@@ -53,7 +52,7 @@ var (
 		},
 	})
 
-	// 缓存大小相关指标
+
 	cacheSize = promauto.NewGauge(prometheus.GaugeOpts{
 		Name: "distcache_size_bytes",
 		Help: "The current size of the cache in bytes",
@@ -70,7 +69,6 @@ var (
 		},
 	})
 
-	// 请求延迟指标
 	requestDuration = promauto.NewHistogramVec(
 		prometheus.HistogramOpts{
 			Name:    "distcache_request_duration_seconds",
@@ -82,7 +80,6 @@ var (
 )
 
 func init() {
-	// 获取主机名作为实例标识符
 	hostname, err := os.Hostname()
 	if err != nil {
 		hostname = "unknown"
@@ -90,19 +87,18 @@ func init() {
 	instanceName = hostname
 }
 
-// StartMetricsServer 启动指标收集服务器
 func StartMetricsServer(port int) {
 	mux := http.NewServeMux()
 
-	// 注册 /metrics 端点
+	// register metrics endpoint
 	mux.Handle("/metrics", promhttp.Handler())
 
-	// 添加从根路径到 /metrics 的重定向
+	// redirect from / to /metrics
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/metrics", http.StatusFound)
 	})
 
-	// 异步启动服务器
+	// async start
 	go func() {
 		addr := fmt.Sprintf(":%d", port)
 		loggerInstance.Infof("Starting metrics server on %s", addr)
@@ -112,27 +108,22 @@ func StartMetricsServer(port int) {
 	}()
 }
 
-// RecordCacheHit 记录缓存命中
 func RecordCacheHit() {
 	cacheHits.Inc()
 }
 
-// RecordCacheMiss 记录缓存未命中
 func RecordCacheMiss() {
 	cacheMisses.Inc()
 }
 
-// RecordEviction 记录缓存驱逐
 func RecordEviction() {
 	cacheEvictions.Inc()
 }
 
-// UpdateCacheSize 更新缓存大小（字节）
 func UpdateCacheSize(size int64) {
 	cacheSize.Set(float64(size))
 }
 
-// UpdateCacheItemCount 更新缓存项数量
 func UpdateCacheItemCount(count int64) {
 	cacheItemCount.Set(float64(count))
 }

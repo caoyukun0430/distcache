@@ -22,10 +22,10 @@ echo "Starting ggcache services..."
 go run main.go -port 9999 &
 sleep 3
 
-go run main.go -port 10000 -metricsPort 2223 -pprofPort 6061 &
+go run main.go -port 10000 -metricsPort 2223 &
 sleep 3
 
-go run main.go -port 10001 -metricsPort 2224 -pprofPort 6062 &
+go run main.go -port 10001 -metricsPort 2224 &
 sleep 3
 
 echo "Starting client tests..."
