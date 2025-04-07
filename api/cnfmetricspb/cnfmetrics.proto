@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package cnfmetricspb;
+
+// Specify the Go package option (adjust the module path as needed).
+option go_package = ".";
+
+import "google/protobuf/timestamp.proto";
+
+// Message representing one CNF Metric record.
+message CnfMetric {
+  string cnf_id = 1;
+  // Using a protobuf Timestamp for the metric's timestamp.
+  google.protobuf.Timestamp timestamp = 2;
+  string metric_type = 3;
+  // Use double so that both integer and fractional values work.
+  double value = 4;
+  string unit = 5;
+  // For simplicity, status is a string such as "Normal", "Warning", or "Info".
+  string status = 6;
+}
+
+// A request message to show a particular CNF metric.
+// It might be based on the CNF ID.
+message CnfMetricRequest {
+  string cnf_id = 1;
+}
+
+// A request message to create (insert) a new CNF metric.
+message CreateCnfMetricRequest {
+  CnfMetric metric = 1;
+}
+
+// A response message that wraps a CNF metric.
+message CnfMetricResponse {
+  CnfMetric metric = 1;
+  int64 code = 2;
+}
+
+// The CNF Metrics service definition.
+service CnfMetricsService {
+  // Returns a specific CNF metric.
+  rpc ShowCnfMetric(CnfMetricRequest) returns (CnfMetricResponse);
+  // Creates a new CNF metric record.
+  rpc CreateCnfMetric(CreateCnfMetricRequest) returns (CnfMetricResponse);
+}

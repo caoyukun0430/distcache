@@ -1,0 +1,33 @@
+mysql:
+    host: 127.0.0.1
+    port: 3306
+    database: groupcache
+    username: root
+    password: 1234
+    charset: utf8mb4
+
+etcd:
+    address: 
+        - 127.0.0.1:2379
+        - 127.0.0.1:22379
+        - 127.0.0.1:32379
+    ttl: 5                   # second
+
+services:
+    groupcache:
+        name: GroupCache
+        addr:
+            - 127.0.0.1:9999
+            - 127.0.0.1:10000
+            - 127.0.0.1:10001
+        ttl:  300            # second
+
+groupManager:
+    strategy: "lru"
+    maxCacheSize: 10240000
+
+domain:
+    cnfMetric:
+        name: cnfMetric
+    groupcache:
+        name: GroupCache
