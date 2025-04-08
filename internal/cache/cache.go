@@ -51,8 +51,7 @@ func (c *cache) get(key string) (ByteView, bool) {
 
 	start := time.Now()
 	defer func() {
-		duration := time.Since(start).Milliseconds()
-		metrics.ObserveRequestDuration("get", float64(duration))
+		metrics.ObserveRequestDuration("get", time.Since(start).Seconds()*1000)
 	}()
 
 	c.mu.RLock()

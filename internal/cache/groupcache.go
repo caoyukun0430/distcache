@@ -150,8 +150,7 @@ func (g *Group) getLocally(key string) (ByteView, error) {
 	// put menas we need to retrieve the data from db and load into the cache
 	start := time.Now()
 	defer func() {
-		duration := time.Since(start).Milliseconds()
-		metrics.ObserveRequestDuration("put", float64(duration))
+		metrics.ObserveRequestDuration("put", time.Since(start).Seconds()*1000)
 	}()
 	bytes, err := g.retriever.retrieve(key)
 	if err != nil {
