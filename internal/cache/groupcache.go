@@ -151,7 +151,7 @@ func (g *Group) getLocally(key string) (ByteView, error) {
 	start := time.Now()
 	defer func() {
 		duration := time.Since(start).Milliseconds()
-		metrics.ObserveRequestDuration("get", float64(duration))
+		metrics.ObserveRequestDuration("put", float64(duration))
 	}()
 	bytes, err := g.retriever.retrieve(key)
 	if err != nil {
