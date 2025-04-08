@@ -147,6 +147,11 @@ func (g *Group) fetchFromPeer(peer Fetcher, key string) (ByteView, error) {
 
 // getLocally retrieves data from the configured retriever and populates the cache.
 func (g *Group) getLocally(key string) (ByteView, error) {
+	// put menas we need to retrieve the data from db and load into the cache
+	start := time.Now()
+	defer func() {
+		metrics.ObserveRequestDuration("put", time.Since(start).Seconds())
+	}()
 	bytes, err := g.retriever.retrieve(key)
 	if err != nil {
 		metrics.RecordDatabaseMiss()

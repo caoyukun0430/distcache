@@ -77,11 +77,6 @@ func (c *cache) put(key string, value ByteView) {
 		return
 	}
 
-	start := time.Now()
-	defer func() {
-		metrics.ObserveRequestDuration("put", time.Since(start).Seconds())
-	}()
-
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
